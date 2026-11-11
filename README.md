@@ -1,71 +1,111 @@
-# Hybrid AI Medical Diagnosis System
+# Hybrid AI-Based Medical Image Classification System
 
-A deep learning-based medical image classification project that uses a hybrid CNN–Transformer architecture to classify brain MRI scans into different tumor categories.
+A deep learning project that explores brain tumor classification from MRI images using a hybrid CNN–Vision Transformer architecture, with attention-based feature fusion and Grad-CAM visualization.
 
 ## Overview
 
-This project aims to assist medical image analysis through an automated brain tumor classification system. It combines the local feature extraction capabilities of Convolutional Neural Networks (CNNs) with the global contextual understanding of Vision Transformers.
+Medical image classification is an important application of deep learning in healthcare. This project explores how different neural network architectures can be combined to classify brain MRI images into tumor categories.
 
-The system also incorporates Grad-CAM visualizations, prediction confidence scores, and AI-assisted clinical guidance to make the model's outputs easier to interpret.
+The system combines **EfficientNet-B0** and **Vision Transformer (ViT-Tiny)** to extract complementary image features. These features are integrated through an attention-based fusion block and passed to a classification head for prediction.
+
+In addition to classification, the project includes Grad-CAM visualizations, prediction probability plots, and a rule-based clinical guidance module.
 
 ## Key Features
 
 - **Brain Tumor Classification:** Classifies MRI images into four categories.
-- **Hybrid Deep Learning Architecture:** Combines EfficientNet-B3 and Vision Transformer.
-- **Cross-Attention Fusion:** Integrates local and global image features.
-- **Confidence Scores:** Displays prediction probabilities for the output classes.
-- **Grad-CAM Visualization:** Highlights image regions that influence the model's predictions.
-- **Clinical Guidance:** Provides AI-assisted guidance based on classification results.
+- **Hybrid CNN–Transformer Architecture:** Combines EfficientNet-B0 and ViT-Tiny.
+- **Attention-Based Feature Fusion:** Uses multi-head attention to combine CNN and Transformer feature representations.
+- **Prediction Probabilities:** Generates probability scores for each classification category.
+- **Grad-CAM Explainability:** Generates heatmaps highlighting image regions that contribute to the model's predictions.
+- **Clinical Guidance:** Maps classification outputs to predefined recommendations and specialist information.
 
-## Tumor Categories
+## Classification Categories
 
-The model classifies MRI scans into:
+The current brain tumor classification configuration supports four classes:
 
-1. Glioma
-2. Meningioma
-3. Pituitary Tumor
-4. No Tumor
+| Class | Description |
+|---|---|
+| Glioma | Glioma tumor category |
+| Meningioma | Meningioma tumor category |
+| No Tumor | No tumor detected by the classifier |
+| Pituitary | Pituitary tumor category |
 
 ## Model Architecture
 
-The proposed architecture consists of three main components:
+The proposed model consists of three main components.
 
-**1. EfficientNet-B3 (CNN)**
+### 1. EfficientNet-B0 (CNN)
 
-Extracts local visual features such as edges, textures, shapes, and structural patterns from MRI images.
+EfficientNet-B0 is used as the convolutional feature extractor.
 
-**2. Vision Transformer (ViT)**
+It extracts spatial and local visual features from MRI images, including patterns, textures, and structural information.
 
-Captures global contextual information by dividing images into patches and learning relationships between them using self-attention.
+The pretrained model uses global average pooling to generate a feature representation.
 
-**3. Cross-Attention Fusion**
+### 2. Vision Transformer (ViT-Tiny)
 
-Combines the features extracted by EfficientNet-B3 and the Vision Transformer to create a unified feature representation for classification.
+A pretrained ViT-Tiny model is used to capture global image representations.
 
-The fused features are passed through a classification head to generate the final prediction probabilities.
+The image is divided into patches, and the Transformer uses self-attention to learn relationships between them.
+
+The Vision Transformer parameters are frozen in the current implementation.
+
+### 3. Attention-Based Feature Fusion
+
+The feature representations from EfficientNet-B0 and ViT-Tiny are projected into a common hidden dimension.
+
+A multi-head attention mechanism combines the projected representations.
+
+The fusion block also includes:
+- Residual connections
+- Layer normalization
+- Feed-forward network
+- GELU activation
+- Dropout
+
+The resulting fused representation is passed through a classification head to produce the final class predictions.
+
+## System Workflow
+
+1. Input brain MRI image.
+2. Image resizing and normalization.
+3. Feature extraction using EfficientNet-B0.
+4. Global feature extraction using ViT-Tiny.
+5. Attention-based feature fusion.
+6. Classification through the final neural network layer.
+7. Prediction probability generation.
+8. Grad-CAM visualization.
+9. Rule-based clinical guidance generation.
+
+## Explainability – Grad-CAM
+
+Grad-CAM (Gradient-weighted Class Activation Mapping) is implemented to visualize the image regions associated with a model prediction.
+
+The system generates:
+- Original MRI image
+- Grad-CAM heatmap
+- Heatmap overlay on the original image
+- Class probability visualization
+
+These visualizations help inspect the model's behavior. They do not establish that a highlighted region is medically significant.
 
 ## Technology Stack
 
-- Python 3.11
-- PyTorch
-- Torchvision
-- TIMM
-- OpenCV
-- NumPy
-- Matplotlib
-- Scikit-learn
-- PIL (Pillow)
+| Category | Technologies |
+|---|---|
+| Programming Language | Python 3.11 |
+| Deep Learning | PyTorch |
+| Model Architectures | EfficientNet, Vision Transformer |
+| Model Library | TIMM |
+| Image Processing | OpenCV, Pillow |
+| Numerical Computing | NumPy |
+| Visualization | Matplotlib |
+| Evaluation | Scikit-learn |
 
 ## Project Structure
 
 ```text
 medicaldiagnosis/
-│
-├── data/
-│   └── brain_tumor/
-│       ├── train/
-│       ├── val/
-│       └── test/
 │
 ├── results/
 │   ├── Te-gl_1_gradcam.png
@@ -83,93 +123,227 @@ medicaldiagnosis/
 ├── model.py
 ├── train.py
 ├── utils.py
-└── training_graphs.png
+├── training_graphs.png
+├── .gitignore
+└── README.md
 ```
 
-*Note: The dataset directory and trained model checkpoints are not included in this GitHub repository.*
+### Important directories not included in GitHub
 
-## Installation
+The following directories are generated or supplied locally and are excluded from the repository:
 
-Clone the repository:
+- `data/` – Dataset images.
+- `checkpoints/` – Trained model checkpoints.
+
+## Installation and Setup
+
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/RiyaBlossoms/medicaldiagnosis.git
 ```
 
-Move into the project directory:
+### 2. Navigate to the project directory
 
 ```bash
 cd medicaldiagnosis
 ```
 
-Install the required libraries:
+### 3. Create a virtual environment
 
 ```bash
-pip install torch torchvision timm opencv-python numpy matplotlib scikit-learn pillow kagglehub
+python -m venv venv
 ```
 
-## Dataset
+Activate it on Windows:
 
-The project uses a Brain Tumor MRI dataset containing more than 7,000 images across four classes.
+```bash
+venv\Scripts\activate
+```
 
-The dataset is divided into:
+### 4. Install dependencies
 
-- Training set – Used to train the model.
-- Validation set – Used to monitor model performance and tune hyperparameters.
-- Testing set – Used for final evaluation.
+```bash
+pip install torch torchvision timm numpy matplotlib scikit-learn opencv-python pillow
+```
 
-Images are resized to 224 × 224 pixels and normalized before being passed to the model.
+For the optional Kaggle dataset download utility:
 
-The dataset is not hosted in this repository. Download or obtain the dataset separately and organize it according to the expected directory structure.
+```bash
+pip install kagglehub
+```
+
+## Dataset Preparation
+
+The brain tumor classification pipeline expects the dataset to follow the PyTorch ImageFolder directory structure.
+
+Organize the dataset as follows:
+
+```text
+data/
+└── brain_tumor/
+    │
+    ├── train/
+    │   ├── glioma/
+    │   ├── meningioma/
+    │   ├── no_tumor/
+    │   └── pituitary/
+    │
+    ├── val/
+    │   ├── glioma/
+    │   ├── meningioma/
+    │   ├── no_tumor/
+    │   └── pituitary/
+    │
+    └── test/
+        ├── glioma/
+        ├── meningioma/
+        ├── no_tumor/
+        └── pituitary/
+```
+
+Each class directory should contain its corresponding MRI images.
+
+**Note:** The dataset is not included in this GitHub repository. Obtain a compatible brain MRI dataset separately and arrange it using the directory structure above.
+
+The `download_datasets.py` utility currently downloads retinal disease and chest X-ray datasets; it does not download the brain tumor dataset used by the current default configuration.
+
+## Image Preprocessing
+
+The dataset pipeline applies the following transformations:
+
+- Resizing images to 224 × 224 pixels.
+- Converting images into tensors.
+- Normalizing using ImageNet mean and standard deviation.
+- Random horizontal flipping during training.
 
 ## Training Configuration
 
+The current configuration includes:
+
 | Parameter | Value |
 |---|---|
+| Image Size | 224 × 224 |
+| Batch Size | 20 |
 | Optimizer | AdamW |
 | Learning Rate | 0.0001 |
-| Batch Size | 2 |
-| Loss Function | Cross Entropy |
+| Weight Decay | 0.00001 |
+| Loss Function | Cross Entropy with Label Smoothing |
 | Scheduler | Cosine Annealing |
 | Dropout | 0.3 |
-| Image Resolution | 224 × 224 |
-| Activation | GELU |
+| Maximum Epochs | 50 |
+| Early Stopping Patience | 10 |
+| Random Seed | 42 |
 
-## Training and Inference
+### Dataset Subset Used
 
-The main training and inference scripts are:
+The current implementation uses a lightweight subset for demonstration:
+
+| Split | Maximum Images |
+|---|---:|
+| Training | 200 |
+| Validation | 50 |
+| Testing | 50 |
+
+These are maximum subset sizes; the actual counts depend on the available dataset.
+
+The subset selection is implemented in `dataset.py`. This is a lightweight experimental setup and should not be interpreted as full-dataset evaluation.
+
+## Running the Project
+
+### 1. Train the model
+
+After preparing the dataset, execute:
 
 ```bash
-python train.py
+python main.py --mode train --disease brain_tumor
 ```
+
+The training pipeline:
+- Loads the dataset.
+- Initializes the hybrid model.
+- Trains the classification head and fusion components.
+- Evaluates validation performance.
+- Saves the best model checkpoint.
+- Generates training and validation loss and accuracy graphs.
+- Evaluates the selected checkpoint on the test subset.
+
+The best checkpoint is saved under:
+
+```text
+checkpoints/brain_tumor_best.pt
+```
+
+### 2. Run inference
+
+To classify an individual MRI image:
 
 ```bash
-python inference.py
+python main.py --mode infer --disease brain_tumor --image path/to/image.jpg --checkpoint checkpoints/brain_tumor_best.pt
 ```
 
-Ensure that the dataset paths and trained model checkpoint paths are configured correctly before running these scripts. Refer to `config.py` and the respective scripts for any additional arguments or setup requirements.
+Replace the image and checkpoint paths with the actual locations on your computer.
 
-## Explainability
+The inference pipeline generates:
+- Predicted class.
+- Prediction confidence.
+- Predefined clinical guidance.
+- Grad-CAM heatmap and overlay.
+- Class probability visualization.
 
-Grad-CAM is used to visualize the regions of MRI images that contribute to the model's predictions.
+Generated outputs are saved in the `results/` directory.
 
-Prediction probability visualizations are also generated to help understand the model's classification output.
+## Training Visualization
 
-Generated visualizations are stored in the `results/` directory.
+The training script generates loss and accuracy curves to help monitor model performance during training.
 
-## Future Scope
+![Training Graphs](training_graphs.png)
 
-- Extend the framework to additional medical imaging datasets.
-- Improve model generalization across different imaging sources.
-- Develop an interactive interface for medical image analysis.
-- Explore additional explainability techniques.
+## Sample Results
+
+The repository contains sample Grad-CAM and prediction probability visualizations.
+
+### Grad-CAM Results
+
+![GradCAM Example 1](results/Te-gl_1_gradcam.png)
+
+![GradCAM Example 2](results/Te-gl_22_gradcam.png)
+
+### Prediction Probability Results
+
+![Prediction Probabilities 1](results/Te-gl_1_probs.png)
+
+![Prediction Probabilities 2](results/Te-gl_22_probs.png)
+
+## Current Limitations
+
+- The current training pipeline uses a small dataset subset for demonstration.
+- The dataset and trained checkpoints are not included in the repository.
+- The model has not been established as clinically validated.
+- Grad-CAM provides visual explanations but does not guarantee the correctness of a prediction.
+- The clinical guidance module uses predefined rules and recommendations, not a validated clinical decision-support system.
+
+## Future Improvements
+
+- Train and evaluate using the complete dataset.
+- Perform more extensive hyperparameter tuning.
+- Improve model generalization across different MRI datasets.
+- Add detailed evaluation metrics and confusion matrix visualizations.
+- Develop an interactive interface for image upload and prediction.
+- Further investigate model explainability techniques.
 
 ## Disclaimer
 
-This project is developed for educational and research purposes. Its predictions and clinical guidance are not a substitute for professional medical diagnosis, radiological interpretation, or advice from qualified healthcare professionals.
+This project is developed for educational and research purposes only.
+
+The model's predictions, confidence scores, Grad-CAM visualizations, and predefined clinical guidance are not intended for medical diagnosis or treatment decisions.
+
+The system is not clinically validated and must not replace professional medical evaluation or advice from qualified healthcare professionals.
 
 ## Author
 
 **Riya Blossoms**
 
-GitHub: [@RiyaBlossoms](https://github.com/RiyaBlossoms)
+GitHub: [RiyaBlossoms](https://github.com/RiyaBlossoms)
+
+Project Repository: [Hybrid AI Medical Diagnosis System](https://github.com/RiyaBlossoms/medicaldiagnosis)
