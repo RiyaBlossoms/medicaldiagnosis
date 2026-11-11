@@ -1,0 +1,26 @@
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Virtual environments
+venv/
+.venv/
+
+# Dataset files
+data/
+
+# Kaggle credentials
+kaggle.json
+.kaggle/
+
+# Environment secrets
+.env
+
+# Model checkpoints
+*.pth
+*.pt
+*.h5
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
